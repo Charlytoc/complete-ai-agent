@@ -76,12 +76,15 @@ while True:
         # Save the recording to a file
         wavio.write(RECORDING_OUTPUT, myrecording, fs, sampwidth=2)
 
+        # Use Whisper to transcribe the audio
         transcription = transcribe_timestamped(RECORDING_OUTPUT)
+
         # Save the transcription to a file
         with open(f"{session_dir}/transcription.txt", "a") as file:
             _content = f"Recording {recording_counter}\n\n{transcription['text']}\n\n"
             file.write(_content)
 
+        # Set the voice for the text-to-speech engine based on the language of the transcription
         voices = engine.getProperty("voices")
         for voice in voices:
             if (
@@ -99,7 +102,6 @@ while True:
         engine.runAndWait()
 
         # Save the completion to a file
-        # Later, when saving the AI completion:
         with open(f"{session_dir}/transcription.txt", "a") as file:
             _content = f"AI Message: {recording_counter}\n\n{completion}\n\n"
             file.write(_content)

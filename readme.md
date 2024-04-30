@@ -1,3 +1,8 @@
+# Run a complete AI agent locally
+
+### [Video tutorial](https://youtu.be/5jtGHk7xths?si=3WyyUmXC6t39m87w)
+
+
 First you must install Ollama:
 Follow this [link](https://ollama.com/download)
 Execute the installer and follow the instructions.
