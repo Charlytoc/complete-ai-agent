@@ -1,2 +1,3 @@
 venv
 recording_sessions
+chroma_db/*

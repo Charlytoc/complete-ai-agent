@@ -6,7 +6,19 @@ import wavio
 import pyttsx3
 from src.completions import create_completion_ollama
 from src.transcriptions import transcribe_timestamped
+from src.vectors import ChromaManager
 
+
+def get_system_prompt(context: str, language: str = "English"):
+    return f"""You are an useful assistant. Your task is just talk with the user and help him solve his task. You must always answer in the same language as the user message. This context may be useful for your task:
+    '''
+    {context}
+    '''
+    
+    You MUST answer in {language} language. This is mandatory.
+    """
+
+chroma = ChromaManager()
 # Initialize the text-to-speech engine
 engine = pyttsx3.init()
 # Print available devices and their IDs
@@ -93,9 +105,13 @@ while True:
                 engine.setProperty("voice", voice.id)
                 break
 
-        completion = create_completion_ollama(transcription["text"], stream=True)
-        with open(f"{session_dir}/transcription.txt", "w") as file:
-            _content = f"AI Message: {recording_counter}\n\n{transcription['text']}\n\n"
+        context = chroma.get_context_from_query(query_text=transcription["text"], n_results=2)
+
+        completion = create_completion_ollama(prompt=transcription["text"],
+                                              system_prompt=get_system_prompt(context, transcription["language"]), stream=True)
+
+        with open(f"{session_dir}/transcription.txt", "a") as file:
+            _content = f"User message: {recording_counter}\n\n{transcription['text']}\n\n"
             file.write(_content)
         # Read aloud the transcription
         engine.say(completion)
