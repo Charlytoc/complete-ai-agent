@@ -7,15 +7,19 @@ import pyttsx3
 from src.completions import create_completion_ollama
 from src.transcriptions import transcribe_timestamped
 from src.vectors import ChromaManager
-
+from src.utils.print_in_color import print_in_color
 
 def get_system_prompt(context: str, language: str = "English"):
-    return f"""You are an useful assistant. Your task is just talk with the user and help him solve his task. You must always answer in the same language as the user message. This context may be useful for your task:
+    return f"""You are an useful assistant. Your task is just talk with the user and help him solve his task. You must always answer in the same language as the user message. 
+    
+    This context may be (or not) useful for your task:
     '''
     {context}
     '''
     
     You MUST answer in {language} language. This is mandatory.
+
+    The user message is the only one thing the user said. You must generate a completion based on that message and use the context if necessary.
     """
 
 chroma = ChromaManager()
@@ -91,9 +95,10 @@ while True:
         # Use Whisper to transcribe the audio
         transcription = transcribe_timestamped(RECORDING_OUTPUT)
 
+        print_in_color(f"Transcription {recording_counter}:", "green")
         # Save the transcription to a file
         with open(f"{session_dir}/transcription.txt", "a") as file:
-            _content = f"Recording {recording_counter}\n\n{transcription['text']}\n\n"
+            _content = f"User message {recording_counter}:\n{transcription['text']}\n\n"
             file.write(_content)
 
         # Set the voice for the text-to-speech engine based on the language of the transcription
@@ -105,22 +110,21 @@ while True:
                 engine.setProperty("voice", voice.id)
                 break
 
-        context = chroma.get_context_from_query(query_text=transcription["text"], n_results=2)
+        context = chroma.get_context_from_query(query_text=transcription["text"], n_results=5)
 
+        # Generate a completion based on the transcription and the context
         completion = create_completion_ollama(prompt=transcription["text"],
                                               system_prompt=get_system_prompt(context, transcription["language"]), stream=True)
 
-        with open(f"{session_dir}/transcription.txt", "a") as file:
-            _content = f"User message: {recording_counter}\n\n{transcription['text']}\n\n"
+        # Save the completion to a file
+        with open(f"{session_dir}/transcription.txt", "a", encoding="utf-8") as file:
+            _content = f"AI Message {recording_counter}:\n{completion}\n\n"
             file.write(_content)
-        # Read aloud the transcription
+
+        # Read aloud the completion
         engine.say(completion)
         engine.runAndWait()
 
-        # Save the completion to a file
-        with open(f"{session_dir}/transcription.txt", "a") as file:
-            _content = f"AI Message: {recording_counter}\n\n{completion}\n\n"
-            file.write(_content)
 
         # Increment the counter for the next recording
         recording_counter += 1

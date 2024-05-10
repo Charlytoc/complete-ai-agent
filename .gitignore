@@ -1,3 +1,8 @@
 venv
 recording_sessions
 chroma_db/*
+__pycache__
+documents/*
+
+!chroma_db/.gitkeep
+!documents/.gitkeep

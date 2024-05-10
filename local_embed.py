@@ -1,45 +1,75 @@
-
-
 from src.vectors import ChromaManager
-from src.internet import get_text_from_page
-from src.completions import create_completion_ollama
+import os
+import PyPDF2
+import csv
+import json
+from docx import Document
 
 chroma = ChromaManager()
 
+# Define the directory containing the documents
+docs_directory = "documents"
 
+# List to store documents and metadata
+some_docs = []
+some_metadatas = []
 
+# Supported file types
+supported_file_types = ['.pdf', '.csv', '.txt', '.json', '.docx']
 
-long_doc = ""
-with open("./very_long_doc.txt", "r", encoding="utf-8") as file:
-    long_doc = file.read()
+# Function to extract text from PDF
+def extract_text_from_pdf(file_path):
+    with open(file_path, "rb") as file:
+        pdf_reader = PyPDF2.PdfReader(file)
+        text = ""
+        for page in pdf_reader.pages:
+            text += page.extract_text()
+    return text
 
+# Function to extract text from CSV
+def extract_text_from_csv(file_path):
+    with open(file_path, newline='', encoding='utf-8') as file:
+        reader = csv.reader(file)
+        text = ' '.join([' '.join(row) for row in reader])
+    return text
 
-some_docs = ["Charly is a software developer with many years of experience, it is a pleasure to work with him.",
-             "Jenniffer is a manicurist, she is very good at what she does.",
-             "John is a teacher, he is very patient with his students.",
-             "Charly likes to cook pizza all homemade.",
-             long_doc]
-some_metadatas = [{"source": "Written in Facebook"}, {"source": "Blog of Jenniffer"}, {"source": "Linkedin"}, {"source": "Twitter"}, {"source": "https://docs.trychroma.com/api-reference"}]
+# Function to extract text from DOCX
+def extract_text_from_docx(file_path):
+    doc = Document(file_path)
+    text = ' '.join([paragraph.text for paragraph in doc.paragraphs])
+    return text
 
+# Function to extract text from JSON
+def extract_text_from_json(file_path):
+    with open(file_path, 'r', encoding='utf-8') as file:
+        data = json.load(file)
+        text = json.dumps(data)
+    return text
+
+# Iterate over files in the specified directory
+for filename in os.listdir(docs_directory):
+    file_path = os.path.join(docs_directory, filename)
+    file_extension = os.path.splitext(filename)[1].lower()
+
+    # Check if the file is of a supported type
+    if file_extension in supported_file_types:
+        print(f"Processing {filename}...")
+        if file_extension == '.pdf':
+            text = extract_text_from_pdf(file_path)
+        elif file_extension == '.csv':
+            text = extract_text_from_csv(file_path)
+        elif file_extension == '.docx':
+            text = extract_text_from_docx(file_path)
+        elif file_extension == '.json':
+            text = extract_text_from_json(file_path)
+        elif file_extension == '.txt':
+            with open(file_path, 'r', encoding='utf-8') as file:
+                text = file.read()
+
+        some_docs.append(text)
+        some_metadatas.append({"source": filename})
+
+# Add documents and metadata to ChromaManager
 chroma.add_documents(docs=some_docs, metadatas=some_metadatas)
-
-
-
-
-
-# prompt = "How to setup a client in Chroma?"
-# context = chroma.get_context_from_query(query_text=prompt, n_results=2)
-
+print("Documents added to Chroma")
 # chroma.delete()
-
-
-# system_prompt = f"""You are an useful assistant. Your task is just talk with the user and help him solve his task. You must always answer in the same language as the user message.
-
-# This context may be useful for your task:
-# '''
-# {context}
-# '''
-# """
-
-# res = create_completion_ollama(prompt=prompt, system_prompt=system_prompt, stream=True)
-
