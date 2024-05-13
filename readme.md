@@ -2,7 +2,11 @@
 With this small project you can run Ollama with llama-3-8b model locally. Also, it uses [Whisper Timestamped](https://github.com/linto-ai/whisper-timestamped) to receive the audio from a microphone of your choose. When the completion (streamed in the console) is ready, the output is then read using the library pyttsx3 (in the future planning to change it for a local AI voice generator also open-source and locally :)
 
 ### [Video tutorial: How to Run LLAMA 3 locally](https://youtu.be/5jtGHk7xths?si=3WyyUmXC6t39m87w)
-![alt text](image.png)
+![image](https://github.com/Charlytoc/complete-ai-agent/assets/107764250/00c30c0b-44e9-4cba-937c-e1f89ccbacd8)
+
+###[Retrieval Augmented Generation local with Llama and Chroma video](https://www.youtube.com/watch?v=vjQAxJ7OVxw)
+
+
 1. You must have Python to run this project. If you don't have it, you can download it [here](https://www.python.org/downloads/).
 
 2. Install Ollama from its website: [Ollama](https://ollama.com/download)
