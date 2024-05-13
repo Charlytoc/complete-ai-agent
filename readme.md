@@ -4,7 +4,7 @@ With this small project you can run Ollama with llama-3-8b model locally. Also, 
 ### [Video tutorial: How to Run LLAMA 3 locally](https://youtu.be/5jtGHk7xths?si=3WyyUmXC6t39m87w)
 ![image](https://github.com/Charlytoc/complete-ai-agent/assets/107764250/00c30c0b-44e9-4cba-937c-e1f89ccbacd8)
 
-###[Retrieval Augmented Generation local with Llama and Chroma video](https://www.youtube.com/watch?v=vjQAxJ7OVxw)
+### [Retrieval Augmented Generation local with Llama and Chroma video](https://www.youtube.com/watch?v=vjQAxJ7OVxw)
 
 
 1. You must have Python to run this project. If you don't have it, you can download it [here](https://www.python.org/downloads/).
